@@ -1,12 +1,11 @@
 import "./App.css";
-import Form from "./Components/Form";
-import Header from "./Components/Header";
+
+import Landing from "./Pages/Landing";
 
 function App() {
   return (
     <div>
-      <Header />
-      <Form />
+      <Landing />
     </div>
   );
 }
