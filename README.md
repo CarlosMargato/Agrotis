@@ -8,7 +8,7 @@ onde foi solicitado a criação de uma aplicação com interface landing page fr
  - material UI
  - hooks
 
- Vale registrar que está foi minha primeira experiência usando Material UI e a lib react hook form. Onde em dois dias busquei compreender o máximo daestas tecnologias para atender os critérios do projeto.
+ Vale registrar que esta foi minha primeira experiência usando Material UI e a lib react hook form. Onde em dois dias busquei compreender o máximo destas tecnologias para atender os critérios do projeto.
 ## Documentação do APP
 
 #### Iniciando o projeto
