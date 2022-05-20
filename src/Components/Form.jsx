@@ -1,35 +1,73 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import Button from "@material-ui/core/Button";
+import {
+  InputLabel,
+  Select,
+  MenuItem,
+  FormControl,
+  TextField,
+  Box,
+  Grid,
+  Paper,
+  makeStyles,
+  createStyles,
+} from "@material-ui/core";
+
 import { farms, labs } from "../Data";
 
-export default function Form() {
-  const [indexProd, setIndexProd] = useState("");
-  const [indexLab, setIndexLab] = useState("");
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 
+const useStyles = makeStyles(() =>
+  createStyles({
+    container: {
+      margin: 32.9,
+    },
+    header: {
+      color: "white",
+    },
+    menuItem: {
+      size: 8,
+    },
+  })
+);
+
+export default function Form() {
+  const [selectedInitialDate, setSelectedInitialDate] = useState(new Date());
+  const [selectedFinalDate, setSelectedFinalDate] = useState(new Date());
+  const styles = useStyles();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
+  const handleInitialDateChange = (date) => {
+    const fulldate = new Date(date);
+
+    setSelectedInitialDate(fulldate);
+  };
+
+  const handleFinalDateChange = (date) => {
+    const fulldate = new Date(date);
+
+    setSelectedFinalDate(fulldate);
+  };
+
   return (
-    <div>
-      <form
-        className="form"
+    <Paper className={styles.container}>
+      <Box
+        container
+        component="form"
         onSubmit={handleSubmit((data) => {
-          const {
-            nome,
-            dataInicial,
-            dataFinal,
-            indexPropriedade,
-            indexlaboratorio,
-            observacoes,
-          } = data;
+          const { nome, indexPropriedade, indexlaboratorio, observacoes } =
+            data;
 
           const form = {
             nome,
-            dataInicial,
-            dataFinal,
+            dataInicial: selectedInitialDate,
+            dataFinal: selectedFinalDate,
             infosPropriedade: {
               id: indexPropriedade,
               ...farms[indexPropriedade],
@@ -43,114 +81,176 @@ export default function Form() {
           console.log(form);
         })}
       >
-        <div>
-          <div>Teste front-end</div>
-          <button type="submit">Salvar</button>
-        </div>
-        <div>
-          <label htmlFor="nome">
-            <div>
-              Nome *:
-              <input
+        <Grid container style={{ boxShadow: "15px" }}>
+          <Grid
+            container
+            direction="row"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              backgroundColor: "darkcyan",
+              height: "72px",
+              padding: 16,
+            }}
+          >
+            <h3 className={styles.header}>Teste front-end</h3>
+            <Button
+              style={{ backgroundColor: "transparent", color: "white" }}
+              align="center"
+              type="submit"
+            >
+              Salvar
+            </Button>
+          </Grid>
+
+          <Grid container direction="row" justifyContent="space-between">
+            <Grid item spacing="8" style={{ padding: 12 }}>
+              <TextField
+                name="nome"
+                required
+                style={{ width: "576px" }}
                 id="nome"
+                label="Nome:"
+                error={!!errors.nome}
+                helperText={
+                  errors.nome
+                    ? errors.nome.message
+                    : "Preencha os campos obrigatórios"
+                }
                 {...register("nome", {
                   required: "Preencha os campos obrigatórios",
                   maxLength: 40,
                 })}
               />
-              <p>
-                {errors.nome?.message ||
-                  errors.dataInicial?.message ||
-                  errors.dataFinal?.message ||
-                  errors.infosPropriedade?.message ||
-                  errors.laboratorio?.message ||
-                  errors.observacoes?.message}
-              </p>
-            </div>
-          </label>
-
-          <label htmlFor="datainicial">
-            <div>
-              Data Inicial *:
-              <input
-                id="datainicial"
-                type="date"
-                {...register("dataInicial", {
-                  required: "Preencha os campos obrigatórios",
-                })}
-              />
-            </div>
-          </label>
-          <label htmlFor="datafinal">
-            <div>
-              Data Final *:
-              <input
-                id="datafinal"
-                type="date"
-                {...register("dataFinal", {
-                  required: "Preencha os campos obrigatórios",
-                })}
-              />
-            </div>
-          </label>
-          <label htmlFor="select1">
-            {indexProd !== "" && <div>Propriedades *</div>}
-            <select
-              name="select1"
-              defaultValue={"DEFAULT"}
-              {...register("indexPropriedade", {
+            </Grid>
+            <Grid item style={{ padding: 16 }}>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DesktopDatePicker
+                  label="Data Inicial:"
+                  name="dataInicial"
+                  inputFormat="MM/dd/yyyy"
+                  value={selectedInitialDate}
+                  onChange={handleInitialDateChange}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </LocalizationProvider>
+            </Grid>
+            <Grid item style={{ padding: 16 }}>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DesktopDatePicker
+                  label="Data Final:"
+                  name="dataFinal"
+                  inputFormat="MM/dd/yyyy"
+                  value={selectedFinalDate}
+                  onChange={handleFinalDateChange}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </LocalizationProvider>
+            </Grid>
+          </Grid>
+          <Grid
+            container
+            direction="row"
+            justifyContent="space-between"
+            spacing="12"
+            style={{ padding: 16 }}
+          >
+            <Grid item spacing="6">
+              <FormControl variant="standard" style={{ width: "576px" }}>
+                <InputLabel id="propriedades">Propriedades</InputLabel>
+                <Select
+                  labelId="propriedades"
+                  id="propriedadesId"
+                  defaultValue={""}
+                  name="propriedades"
+                  // inputRef={register}
+                  error={!!errors.propriedades}
+                  helperText={
+                    errors.propriedades
+                      ? errors.propriedades.message
+                      : "Preencha os campos obrigatórios"
+                  }
+                  {...register("indexPropriedade", {
+                    required: "Preencha os campos obrigatórios",
+                  })}
+                  label="Propriedades"
+                >
+                  <MenuItem value="">
+                    <em></em>
+                  </MenuItem>
+                  {farms.map(({ nome, cnpj }, id) => {
+                    return (
+                      <MenuItem
+                        key={id}
+                        direction="column"
+                        className={styles.menuItem}
+                        value={id}
+                      >
+                        <>{nome}</>
+                        <>{cnpj}</>
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item spacing="6">
+              <FormControl variant="standard" style={{ width: "576px" }}>
+                <InputLabel id="laboratorio">Laboratório</InputLabel>
+                <Select
+                  labelId="laboratorio"
+                  id="laboratorioId"
+                  defaultValue={""}
+                  error={!!errors.laboratorio}
+                  helperText={
+                    errors.laboratorio
+                      ? errors.laboratorio.message
+                      : "Preencha os campos obrigatórios"
+                  }
+                  {...register("indexlaboratorio", {
+                    required: "Preencha os campos obrigatórios",
+                  })}
+                  label="laboratorio"
+                >
+                  <MenuItem value="">
+                    <em></em>
+                  </MenuItem>
+                  {labs.map((lab, id) => {
+                    return (
+                      <MenuItem key={id} value={id}>
+                        {lab}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+          <Grid item style={{ padding: 16, width: "100%", marginBottom: 44 }}>
+            <TextField
+              name="observacoes"
+              style={{ marginBottom: 44 }}
+              required
+              fullWidth
+              id="observacoes"
+              label="Observações:"
+              multiline
+              rows={10}
+              defaultValue={""}
+              error={!!errors.observacoes}
+              helperText={
+                errors.observacoes
+                  ? errors.observacoes.message
+                  : "Preencha os campos obrigatórios"
+              }
+              {...register("observacoes", {
                 required: "Preencha os campos obrigatórios",
+                maxLength: 1000,
               })}
-              value={indexProd}
-              onChange={({ target }) => setIndexProd(target.value)}
-            >
-              <option value="DEFAULT">Propriedades</option>
-              {farms.map(({ nome, cnpj }, id) => {
-                return (
-                  <option key={id} value={id}>
-                    <>{nome}</>
-                    <>{cnpj}</>
-                  </option>
-                );
-              })}
-            </select>
-          </label>
-          <label htmlFor="select2">
-            {indexLab !== "" && <div>Laboratório *</div>}
-            <select
-              name="select2"
-              defaultValue={"DEFAULT"}
-              {...register("indexlaboratorio", {
-                required: "Preencha os campos obrigatórios",
-              })}
-              value={indexLab}
-              onChange={({ target }) => setIndexLab(target.value)}
-            >
-              <option value="DEFAULT">Laboratório</option>
-              {labs.map((lab, id) => {
-                return (
-                  <option key={id} value={id}>
-                    {lab}
-                  </option>
-                );
-              })}
-            </select>
-          </label>
-          <label htmlFor="observacoes">
-            <div>
-              Observações:
-              <input
-                id="observacoes"
-                type="text-area"
-                {...register("observacoes", {
-                  required: "Preencha os campos obrigatórios",
-                  maxLength: 1000,
-                })}
-              />
-            </div>
-          </label>
-        </div>
-      </form>
-    </div>
+            />
+          </Grid>
+        </Grid>
+      </Box>
+    </Paper>
   );
 }
